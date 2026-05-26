@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude + Git + Cursor · Quick Reference Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800&family=Roboto:wght@400;500&family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --xplor-purple:            #6923F4;
+  --xplor-purple-shade:      #401F9F;
+  --xplor-purple-tint-1:     #8C85FF;
+  --xplor-purple-tint-2:     #BABEFC;
+  --xplor-teal:              #3ACBCA;
+  --xplor-teal-shade:        #0FA3A4;
+  --xplor-teal-tint-2:       #C7F0F0;
+  --xplor-lime:              #A2E10B;
+  --xplor-lime-tint-2:       #E4F6B9;
+  --xplor-light-grey-tint-2: #F1F6FA;
+  --xplor-darkest-grey:      #282F35;
+  --xplor-dark-grey:         #545D63;
+  --xplor-mid-grey:          #8C969F;
+  --xplor-grey:              #B4BEC6;
+  --xplor-white:             #FFFFFF;
+  --xplor-pink:              #E44597;
+  --font-heading: 'Poppins', sans-serif;
+  --font-body:    'Roboto', sans-serif;
+  --font-mono:    'Roboto Mono', monospace;
+  --radius:       10px;
+  --radius-lg:    16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--xplor-light-grey-tint-2);
+  color: var(--xplor-darkest-grey);
+  line-height: 1.6;
+}
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--xplor-darkest-grey);
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 32px;
+  height: 52px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+nav::-webkit-scrollbar { display: none; }
+.nav-logo {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  color: var(--xplor-white);
+  white-space: nowrap;
+  margin-right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.nav-logo .dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--xplor-purple);
+  display: inline-block;
+}
+.nav-tabs { display: flex; gap: 4px; }
+.nav-tab {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--xplor-grey);
+  background: none;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s, color .15s;
+}
+.nav-tab:hover { background: rgba(255,255,255,.08); color: var(--xplor-white); }
+.nav-tab.active { background: var(--xplor-purple); color: var(--xplor-white); }
+
+/* ── HERO ── */
+.hero {
+  background: linear-gradient(135deg, #401F9F 0%, #6923F4 100%);
+  color: var(--xplor-white);
+  padding: 56px 48px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  right: -60px; bottom: -60px;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  background: rgba(58,203,202,.15);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--xplor-teal-tint-2);
+  margin-bottom: 10px;
+}
+.hero h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 4vw, 40px);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+.hero p {
+  font-size: 15px;
+  color: rgba(255,255,255,.75);
+  max-width: 520px;
+}
+.hero-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.hero-tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.12);
+  color: var(--xplor-white);
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+/* ── TABS CONTENT ── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── SECTIONS ── */
+.section {
+  padding: 48px;
+  background: var(--xplor-white);
+}
+.section.alt { background: var(--xplor-light-grey-tint-2); }
+.section-title {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--xplor-purple);
+  margin-bottom: 6px;
+}
+.section-sub {
+  font-size: 14px;
+  color: var(--xplor-dark-grey);
+  margin-bottom: 28px;
+}
+
+/* ── CARDS GRID ── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+}
+.card {
+  background: var(--xplor-white);
+  border: 1px solid var(--xplor-grey);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: box-shadow .2s, transform .2s, border-color .2s;
+  cursor: default;
+}
+.card:hover {
+  box-shadow: 0 8px 24px rgba(105,35,244,.12);
+  transform: translateY(-2px);
+  border-color: var(--xplor-purple-tint-2);
+}
+.card-icon {
+  font-size: 24px;
+  margin-bottom: 10px;
+  display: block;
+}
+.card-title {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  color: var(--xplor-darkest-grey);
+  margin-bottom: 4px;
+}
+.card-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+.tag-chat    { background: var(--xplor-teal-tint-2); color: var(--xplor-teal-shade); }
+.tag-code    { background: #FFF3DC; color: #7A5100; }
+.tag-cowork  { background: var(--xplor-purple-tint-2); color: var(--xplor-purple-shade); }
+.tag-skill   { background: #E3F5FF; color: #0A5A82; }
+.tag-agent   { background: #FDE9F4; color: #8F1E56; }
+
+.card-body {
+  font-size: 13px;
+  color: var(--xplor-dark-grey);
+  line-height: 1.55;
+}
+.card-analogy {
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--xplor-mid-grey);
+  border-top: 1px solid var(--xplor-light-grey-tint-2);
+  padding-top: 8px;
+}
+.card-analogy strong { color: var(--xplor-purple); font-weight: 500; }
+
+/* ── INSIGHT BAND ── */
+.insight-band {
+  background: linear-gradient(135deg, #6923F4 0%, #3ACBCA 100%);
+  color: var(--xplor-white);
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.insight-band .insight-label {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.18);
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.insight-band p {
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* ── GIT TIMELINE ── */
+.git-timeline {
+  position: relative;
+  padding-left: 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.git-timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 24px;
+  bottom: 24px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--xplor-purple), var(--xplor-teal));
+  border-radius: 2px;
+}
+.git-stop {
+  position: relative;
+  padding: 0 0 24px;
+}
+.git-stop:last-child { padding-bottom: 0; }
+.git-stop-dot {
+  position: absolute;
+  left: -44px;
+  top: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  border: 2px solid var(--xplor-white);
+  box-shadow: 0 0 0 2px var(--xplor-grey);
+}
+.dot-purple { background: var(--xplor-purple); color: var(--xplor-white); }
+.dot-teal   { background: var(--xplor-teal); color: var(--xplor-darkest-grey); }
+.dot-amber  { background: #EF9F27; color: var(--xplor-darkest-grey); }
+.dot-green  { background: #3B8B3B; color: var(--xplor-white); }
+.dot-coral  { background: var(--xplor-pink); color: var(--xplor-white); }
+
+.git-stop-inner {
+  background: var(--xplor-white);
+  border: 1px solid var(--xplor-grey);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.git-stop-inner:hover {
+  border-color: var(--xplor-purple-tint-1);
+  box-shadow: 0 4px 14px rgba(105,35,244,.1);
+}
+.git-stop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.git-stop-title {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  color: var(--xplor-darkest-grey);
+}
+.git-cmd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--xplor-light-grey-tint-2);
+  color: var(--xplor-purple);
+  border: 1px solid var(--xplor-purple-tint-2);
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+.git-stop-body {
+  font-size: 13px;
+  color: var(--xplor-dark-grey);
+}
+.git-connector {
+  font-size: 11px;
+  color: var(--xplor-mid-grey);
+  font-family: var(--font-mono);
+  padding: 6px 0 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.git-connector::before {
+  content: '↓';
+  font-size: 14px;
+  color: var(--xplor-purple-tint-1);
+}
+
+/* ── WORD BANK ── */
+.wb-filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.wb-filter {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--xplor-grey);
+  background: var(--xplor-white);
+  color: var(--xplor-dark-grey);
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-body);
+}
+.wb-filter:hover, .wb-filter.active {
+  background: var(--xplor-purple);
+  border-color: var(--xplor-purple);
+  color: var(--xplor-white);
+}
+.wb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.wb-card {
+  background: var(--xplor-white);
+  border: 1px solid var(--xplor-grey);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  transition: all .2s;
+}
+.wb-card:hover {
+  border-color: var(--xplor-purple-tint-1);
+  box-shadow: 0 4px 12px rgba(105,35,244,.1);
+}
+.wb-card[data-hidden] { display: none; }
+.wb-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+.badge-git    { background: #FFF3DC; color: #7A5100; }
+.badge-gh     { background: #E3EEFF; color: #1A3A8A; }
+.badge-claude { background: var(--xplor-lime-tint-2); color: #3D5900; }
+.wb-term {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  color: var(--xplor-darkest-grey);
+  margin-bottom: 4px;
+}
+.wb-def {
+  font-size: 12px;
+  color: var(--xplor-dark-grey);
+  line-height: 1.5;
+}
+
+/* ── HOW SKILLS WORK ── */
+.skill-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+.skill-card {
+  background: var(--xplor-light-grey-tint-2);
+  border: 1px solid var(--xplor-grey);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.skill-card-head {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  color: var(--xplor-purple);
+  margin-bottom: 8px;
+}
+.skill-card-body {
+  font-size: 12px;
+  color: var(--xplor-dark-grey);
+  line-height: 1.55;
+}
+.skill-card code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--xplor-white);
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--xplor-grey);
+  color: var(--xplor-purple);
+}
+
+/* ── FOOTER ── */
+footer {
+  background: var(--xplor-darkest-grey);
+  color: var(--xplor-grey);
+  padding: 24px 48px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+footer strong { color: var(--xplor-teal); font-weight: 500; }
+
+/* ── CURSOR ── */
+.tag-cursor { background: #E8F5E8; color: #1A5C1A; }
+.badge-cursor { background: #E8F5E8; color: #1A5C1A; }
+
+.cursor-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+@media (max-width: 600px) { .cursor-compare { grid-template-columns: 1fr; } }
+
+.compare-col {
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  border: 1px solid var(--xplor-grey);
+}
+.compare-col.col-cursor { background: #F0FFF0; border-color: #A8DBA8; }
+.compare-col.col-claude { background: var(--xplor-purple-tint-2); border-color: var(--xplor-purple-tint-1); opacity: 0.85; }
+.compare-col-title {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-col.col-cursor .compare-col-title { color: #1A5C1A; }
+.compare-col.col-claude .compare-col-title { color: var(--xplor-purple-shade); }
+.compare-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.compare-list li {
+  font-size: 13px;
+  color: var(--xplor-dark-grey);
+  padding-left: 18px;
+  position: relative;
+  line-height: 1.5;
+}
+.compare-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--xplor-mid-grey);
+  font-size: 11px;
+  top: 1px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.feature-card {
+  background: var(--xplor-white);
+  border: 1px solid var(--xplor-grey);
+  border-radius: var(--radius);
+  padding: 18px;
+  transition: all .2s;
+}
+.feature-card:hover {
+  border-color: #A8DBA8;
+  box-shadow: 0 4px 14px rgba(26,92,26,.08);
+}
+.feature-card-head {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  color: var(--xplor-darkest-grey);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.feature-card-icon {
+  font-size: 16px;
+}
+.feature-card-body {
+  font-size: 12px;
+  color: var(--xplor-dark-grey);
+  line-height: 1.55;
+}
+.feature-card code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--xplor-light-grey-tint-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--xplor-grey);
+  color: #1A5C1A;
+}
+
+.shortcut-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.shortcut-table th {
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  padding: 8px 12px;
+  background: var(--xplor-light-grey-tint-2);
+  color: var(--xplor-dark-grey);
+  border-bottom: 1px solid var(--xplor-grey);
+}
+.shortcut-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--xplor-light-grey-tint-2);
+  color: var(--xplor-darkest-grey);
+  vertical-align: top;
+}
+.shortcut-table tr:last-child td { border-bottom: none; }
+.shortcut-table tr:hover td { background: #F0FFF0; }
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--xplor-white);
+  border: 1px solid var(--xplor-grey);
+  border-bottom: 2px solid var(--xplor-grey);
+  border-radius: 4px;
+  padding: 2px 6px;
+  white-space: nowrap;
+  color: var(--xplor-darkest-grey);
+}
+.shortcut-desc { color: var(--xplor-dark-grey); font-size: 13px; }
+
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rule-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--xplor-white);
+  border: 1px solid var(--xplor-grey);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: border-color .2s;
+}
+.rule-item:hover { border-color: #A8DBA8; }
+.rule-num {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #1A5C1A;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rule-content-title {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  color: var(--xplor-darkest-grey);
+  margin-bottom: 3px;
+}
+.rule-content-body {
+  font-size: 12px;
+  color: var(--xplor-dark-grey);
+  line-height: 1.55;
+}
+.rule-content-body code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--xplor-light-grey-tint-2);
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--xplor-grey);
+  color: #1A5C1A;
+}
+
+.insight-band.green {
+  background: linear-gradient(135deg, #1A5C1A 0%, #3ACBCA 100%);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .hero, .section, footer { padding: 32px 20px; }
+  .insight-band { padding: 20px; flex-direction: column; align-items: flex-start; }
+  .git-timeline { padding-left: 44px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span class="dot"></span>Claude · Git Guide</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('ecosystem')">Claude ecosystem</button>
+    <button class="nav-tab" onclick="showTab('git')">Git workflow</button>
+    <button class="nav-tab" onclick="showTab('cursor')">Cursor</button>
+    <button class="nav-tab" onclick="showTab('wordbank')">Word bank</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-eyebrow">Quick reference guide</div>
+  <h1>Claude + Git + Cursor<br>for the Xplor team</h1>
+  <p>How Claude Chat, Code, and Cowork connect — plus the full Git/GitHub PR workflow and a guide to Cursor for engineers.</p>
+  <div class="hero-tags">
+    <span class="hero-tag">Claude Chat</span>
+    <span class="hero-tag">Claude Code</span>
+    <span class="hero-tag">Cowork desktop</span>
+    <span class="hero-tag">Skills &amp; agents</span>
+    <span class="hero-tag">Git + GitHub</span>
+    <span class="hero-tag">Cursor</span>
+  </div>
+</header>
+
+<!-- ═══ TAB 1: ECOSYSTEM ═══ -->
+<div id="tab-ecosystem" class="tab-panel active">
+
+  <section class="section">
+    <svg width="100%" viewBox="0 0 780 860" role="img" style="display:block;max-width:780px;margin:0 auto;"
+         xmlns="http://www.w3.org/2000/svg">
+      <title>The Claude city</title>
+      <desc>Diagram showing how Claude Chat, Cowork desktop, and Claude Code relate to Skills, Agents, and MCP tools, using a city metaphor.</desc>
+      <defs>
+        <marker id="ccarrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#B4BEC6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="ccarrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#8C969F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- TITLE -->
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="20" fill="#282F35" x="390" y="36" text-anchor="middle">The Claude city</text>
+      <text font-family="'Roboto', sans-serif" font-size="13" fill="#545D63" x="390" y="58" text-anchor="middle">Think of Claude as a smart city — each interface is a building, skills are specialist shops</text>
+
+      <!-- ── TOP ROW: 3 interface cards ── -->
+
+      <!-- Claude Chat card -->
+      <rect x="30" y="78" width="210" height="148" rx="14" fill="#E8F7F3" stroke="#3ACBCA" stroke-width="1.5"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="15" fill="#0F6E56" x="135" y="108" text-anchor="middle">Claude Chat</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#0FA3A4" x="135" y="127" text-anchor="middle">☕  The café</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#1D9E75" x="135" y="147" text-anchor="middle">Conversational AI</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#1D9E75" x="135" y="163" text-anchor="middle">in your browser</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#1D9E75" x="135" y="179" text-anchor="middle">or mobile app</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#0F6E56" x="135" y="199" text-anchor="middle">Ask anything, get answers</text>
+
+      <!-- Cowork card -->
+      <rect x="285" y="78" width="210" height="148" rx="14" fill="#EDE8FE" stroke="#8C85FF" stroke-width="1.5"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="15" fill="#401F9F" x="390" y="108" text-anchor="middle">Cowork desktop</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#6923F4" x="390" y="127" text-anchor="middle">🏛  City hall</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#534AB7" x="390" y="147" text-anchor="middle">Orchestrates tasks</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#534AB7" x="390" y="163" text-anchor="middle">on your local machine —</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#534AB7" x="390" y="179" text-anchor="middle">files, folders, apps</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#401F9F" x="390" y="199" text-anchor="middle">No code required</text>
+
+      <!-- Claude Code card -->
+      <rect x="540" y="78" width="210" height="148" rx="14" fill="#FFF7E6" stroke="#EF9F27" stroke-width="1.5"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="15" fill="#7A5100" x="645" y="108" text-anchor="middle">Claude Code</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#BA7517" x="645" y="127" text-anchor="middle">🔧  The workshop</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#854F0B" x="645" y="147" text-anchor="middle">CLI agent in your</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#854F0B" x="645" y="163" text-anchor="middle">terminal — reads, edits,</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#854F0B" x="645" y="179" text-anchor="middle">runs, and ships code</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#7A5100" x="645" y="199" text-anchor="middle">For engineers</text>
+
+      <!-- Divider with shared brain label -->
+      <line x1="30" y1="252" x2="750" y2="252" stroke="#E3EAEF" stroke-width="1.5" stroke-dasharray="6 4"/>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#8C969F" x="390" y="274" text-anchor="middle">All interfaces share the same Claude brain — conversations, context, and memory</text>
+
+      <!-- Downward arrows from interface cards -->
+      <line x1="135" y1="228" x2="135" y2="295" stroke="#B4BEC6" stroke-width="1.5" marker-end="url(#ccarrow)"/>
+      <line x1="390" y1="228" x2="390" y2="295" stroke="#B4BEC6" stroke-width="1.5" marker-end="url(#ccarrow)"/>
+      <line x1="645" y1="228" x2="645" y2="295" stroke="#B4BEC6" stroke-width="1.5" marker-end="url(#ccarrow)"/>
+
+      <!-- ── MIDDLE ROW: Skills + Agents ── -->
+
+      <!-- Skills card -->
+      <rect x="30" y="295" width="330" height="168" rx="14" fill="#EAF1FB" stroke="#378ADD" stroke-width="1.5"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="15" fill="#0C447C" x="195" y="325" text-anchor="middle">Skills</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#185FA5" x="195" y="344" text-anchor="middle">🛠  Specialist shops in the city</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#378ADD" x="195" y="364" text-anchor="middle">SKILL.md files that give Claude</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#378ADD" x="195" y="380" text-anchor="middle">a specific playbook — like a PPT</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#378ADD" x="195" y="396" text-anchor="middle">builder, brand guide, or PRD writer</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#185FA5" x="195" y="416" text-anchor="middle">Loaded on demand when triggered</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#8C969F" x="195" y="450" text-anchor="middle">Trigger: /xplor-ppt-skill, /decision-council…</text>
+
+      <!-- "powers" arrow -->
+      <line x1="362" y1="379" x2="418" y2="379" stroke="#8C969F" stroke-width="1.5" marker-end="url(#ccarrow2)"/>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#8C969F" x="390" y="371" text-anchor="middle">powers</text>
+
+      <!-- Agents card -->
+      <rect x="420" y="295" width="330" height="168" rx="14" fill="#FDE9EE" stroke="#D4537E" stroke-width="1.5"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="15" fill="#72243E" x="585" y="325" text-anchor="middle">Agents</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#993556" x="585" y="344" text-anchor="middle">🚴  Couriers in the city</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#D4537E" x="585" y="364" text-anchor="middle">Claude takes multi-step actions</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#D4537E" x="585" y="380" text-anchor="middle">autonomously — web search,</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#D4537E" x="585" y="396" text-anchor="middle">file edits, tool calls, API calls</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#993556" x="585" y="416" text-anchor="middle">No hand-holding needed</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#8C969F" x="585" y="450" text-anchor="middle">Used in: Cowork automations, Claude Code</text>
+
+      <!-- ── KEY INSIGHT BOX ── -->
+      <rect x="30" y="490" width="720" height="72" rx="12" fill="#FFFFFF" stroke="#6923F4" stroke-width="1.5"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="14" fill="#6923F4" x="390" y="516" text-anchor="middle">Key insight</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#282F35" x="390" y="536" text-anchor="middle">Chat = you talk to Claude.  Code = Claude acts in your codebase.  Cowork = Claude acts on your desktop.</text>
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#545D63" x="390" y="553" text-anchor="middle">Skills narrow what Claude does.  Agents handle how it does it autonomously.</text>
+
+      <!-- ── BOTTOM ROW: How each interface talks to skills ── -->
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="14" fill="#282F35" x="390" y="602" text-anchor="middle">How each interface loads context</text>
+
+      <!-- Chat mini card -->
+      <rect x="30" y="618" width="158" height="110" rx="10" fill="#F1F6FA" stroke="#B4BEC6" stroke-width="1"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="13" fill="#282F35" x="109" y="642" text-anchor="middle">Chat</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="109" y="660" text-anchor="middle">Reads SKILL.md</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="109" y="676" text-anchor="middle">from /mnt/skills</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="109" y="692" text-anchor="middle">on first trigger</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="109" y="708" text-anchor="middle">in a session</text>
+
+      <!-- Code mini card -->
+      <rect x="206" y="618" width="158" height="110" rx="10" fill="#F1F6FA" stroke="#B4BEC6" stroke-width="1"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="13" fill="#282F35" x="285" y="642" text-anchor="middle">Code</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="285" y="660" text-anchor="middle">CLAUDE.md in</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="285" y="676" text-anchor="middle">the repo root</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="285" y="692" text-anchor="middle">sets persistent</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="285" y="708" text-anchor="middle">project context</text>
+
+      <!-- Cowork mini card -->
+      <rect x="382" y="618" width="158" height="110" rx="10" fill="#F1F6FA" stroke="#B4BEC6" stroke-width="1"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="13" fill="#282F35" x="461" y="642" text-anchor="middle">Cowork</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="461" y="660" text-anchor="middle">Workflows +</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="461" y="676" text-anchor="middle">automations run</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="461" y="692" text-anchor="middle">across apps and</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="461" y="708" text-anchor="middle">local files</text>
+
+      <!-- MCP mini card -->
+      <rect x="558" y="618" width="192" height="110" rx="10" fill="#F1F6FA" stroke="#B4BEC6" stroke-width="1"/>
+      <text font-family="'Poppins', sans-serif" font-weight="700" font-size="13" fill="#282F35" x="654" y="642" text-anchor="middle">MCP tools</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="654" y="660" text-anchor="middle">Connectors that let</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="654" y="676" text-anchor="middle">agents talk to Jira,</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="654" y="692" text-anchor="middle">Notion, GitHub,</text>
+      <text font-family="'Roboto', sans-serif" font-size="11" fill="#545D63" x="654" y="708" text-anchor="middle">Figma, and more</text>
+
+      <!-- Footer note -->
+      <text font-family="'Roboto', sans-serif" font-size="12" fill="#8C969F" x="390" y="754" text-anchor="middle">Scroll down to explore skills, agents, and how each interface works in detail ↓</text>
+    </svg>
+  </section>
+
+  <div class="insight-band">
+    <span class="insight-label">Key insight</span>
+    <p>Chat = <em>you</em> talk to Claude. Code = Claude acts <em>in your codebase</em>. Cowork = Claude acts <em>on your desktop</em>. All three share the same underlying model.</p>
+  </div>
+
+  <section class="section alt">
+    <div class="section-title">Skills and agents</div>
+    <div class="section-sub">The infrastructure layer underneath all three interfaces.</div>
+    <div class="cards-grid">
+
+      <div class="card">
+        <span class="card-icon">🛠️</span>
+        <span class="card-tag tag-skill">Skills</span>
+        <div class="card-title">Skills</div>
+        <div class="card-body">SKILL.md files that give Claude a specific playbook — a PPT builder, brand guide, PRD writer, or anything you define. Loaded on-demand when a trigger phrase is detected.</div>
+        <div class="card-analogy"><strong>Analogy:</strong> Specialist shops in the city. You walk in, they know exactly what to do.</div>
+      </div>
+
+      <div class="card">
+        <span class="card-icon">🚴</span>
+        <span class="card-tag tag-agent">Agents</span>
+        <div class="card-title">Agents</div>
+        <div class="card-body">Claude takes multi-step actions autonomously — web search, file edits, API calls, tool use. You describe the goal; Claude figures out the steps.</div>
+        <div class="card-analogy"><strong>Analogy:</strong> Couriers. You say "deliver this", they figure out the route.</div>
+      </div>
+
+      <div class="card">
+        <span class="card-icon">🔌</span>
+        <span class="card-tag tag-skill">MCP tools</span>
+        <div class="card-title">MCP connectors</div>
+        <div class="card-body">Integrations that let Claude talk to external apps — Jira, Notion, Figma, GitHub, Slack and more. Connected once, available in every session.</div>
+        <div class="card-analogy"><strong>Analogy:</strong> Phone lines into the city. The courier can call any department.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">How skills are loaded per interface</div>
+    <div class="section-sub">The mechanism varies, but the principle is the same — context shapes what Claude does.</div>
+    <div class="skill-row">
+      <div class="skill-card">
+        <div class="skill-card-head">Chat</div>
+        <div class="skill-card-body">Reads <code>SKILL.md</code> from <code>/mnt/skills/</code> on first trigger in a session. Skills are scoped to your account — shared across all chats.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-head">Claude Code</div>
+        <div class="skill-card-body">A <code>CLAUDE.md</code> file in your repo root sets persistent project context — coding standards, architecture notes, key patterns. Read every session automatically.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-head">Cowork</div>
+        <div class="skill-card-body">Workflow automations define the steps. Claude executes them across your desktop apps — no terminal or coding required.</div>
+      </div>
+      <div class="skill-card">
+        <div class="skill-card-head">Memory</div>
+        <div class="skill-card-body">Summaries from past chats are stored and injected into future sessions. Claude remembers your name, role, tools, and preferences across conversations.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══ TAB 2: GIT WORKFLOW ═══ -->
+<div id="tab-git" class="tab-panel">
+
+  <section class="section">
+    <div class="section-title">The Git railway</div>
+    <div class="section-sub">Ten stops from remote repo → your machine → back to GitHub → merged to main. You never work directly on main.</div>
+
+    <div class="git-timeline">
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-purple">1</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">GitHub remote repo</span>
+            <span class="git-cmd">github.com</span>
+          </div>
+          <div class="git-stop-body">The central source of truth. Lives on GitHub. Everyone's code eventually lands here on the <code style="font-family:var(--font-mono);font-size:12px;background:var(--xplor-light-grey-tint-2);padding:1px 5px;border-radius:4px;color:var(--xplor-purple)">main</code> branch.</div>
+        </div>
+      </div>
+      <div class="git-connector">git clone &lt;repo-url&gt;</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-teal">2</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Clone the repo</span>
+            <span class="git-cmd">git clone &lt;url&gt;</span>
+          </div>
+          <div class="git-stop-body">Downloads the full repository to your local machine. You now have a complete copy including all history and branches. You start on <code style="font-family:var(--font-mono);font-size:12px;background:var(--xplor-light-grey-tint-2);padding:1px 5px;border-radius:4px;color:var(--xplor-purple)">main</code>.</div>
+        </div>
+      </div>
+      <div class="git-connector">git checkout -b my-feature-branch</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-teal">3</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Create a branch</span>
+            <span class="git-cmd">git checkout -b &lt;name&gt;</span>
+          </div>
+          <div class="git-stop-body">A safe copy of main for your work. Changes you make here are fully isolated — they won't affect main until you explicitly merge. Name branches descriptively: <code style="font-family:var(--font-mono);font-size:12px;background:var(--xplor-light-grey-tint-2);padding:1px 5px;border-radius:4px;color:var(--xplor-purple)">feat/add-refund-flow</code>.</div>
+        </div>
+      </div>
+      <div class="git-connector">edit files in VS Code / any editor</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-teal">4</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Make your changes</span>
+            <span class="git-cmd">your editor</span>
+          </div>
+          <div class="git-stop-body">Edit code, add files, delete things. Everything is local — nothing is shared with the team yet. Use <code style="font-family:var(--font-mono);font-size:12px;background:var(--xplor-light-grey-tint-2);padding:1px 5px;border-radius:4px;color:var(--xplor-purple)">git status</code> to see what's changed at any point.</div>
+        </div>
+      </div>
+      <div class="git-connector">git add . &amp;&amp; git commit -m "description"</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-teal">5</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Stage and commit</span>
+            <span class="git-cmd">git add . · git commit</span>
+          </div>
+          <div class="git-stop-body"><strong>Stage</strong> = pack your suitcase. <strong>Commit</strong> = lock it with a label. A commit is a permanent snapshot with a message. Commit often — small, focused commits are easier to review and reverse.</div>
+        </div>
+      </div>
+      <div class="git-connector">git push origin &lt;branch-name&gt;</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-amber">6</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Push to GitHub</span>
+            <span class="git-cmd">git push origin &lt;branch&gt;</span>
+          </div>
+          <div class="git-stop-body">Uploads your branch to the remote repo so your teammates can see it. <code style="font-family:var(--font-mono);font-size:12px;background:var(--xplor-light-grey-tint-2);padding:1px 5px;border-radius:4px;color:var(--xplor-purple)">origin</code> is the default nickname for the repo you cloned from.</div>
+        </div>
+      </div>
+      <div class="git-connector">open github.com → "Compare &amp; pull request"</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-amber">7</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Open a pull request (PR)</span>
+            <span class="git-cmd">github.com</span>
+          </div>
+          <div class="git-stop-body">A proposal to merge your branch into main. Write a clear title and description — what changed and why. Assign reviewers. This starts the conversation before anything lands in main.</div>
+        </div>
+      </div>
+      <div class="git-connector">teammates review, comment, request changes</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-coral">8</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Review and iterate</span>
+            <span class="git-cmd">push more commits</span>
+          </div>
+          <div class="git-stop-body">Reviewers leave comments on specific lines. You push additional commits to address feedback — they appear in the same PR automatically. Repeat until approved (✅).</div>
+        </div>
+      </div>
+      <div class="git-connector">click "Merge pull request" on github.com</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-green">9</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Merge into main</span>
+            <span class="git-cmd">github.com merge</span>
+          </div>
+          <div class="git-stop-body">Your commits land in main. The branch can now be deleted. Your work is officially part of the codebase and will be deployed in the next release.</div>
+        </div>
+      </div>
+      <div class="git-connector">git checkout main &amp;&amp; git pull origin main</div>
+
+      <div class="git-stop">
+        <div class="git-stop-dot dot-green">10</div>
+        <div class="git-stop-inner">
+          <div class="git-stop-header">
+            <span class="git-stop-title">Sync your local main</span>
+            <span class="git-cmd">git pull origin main</span>
+          </div>
+          <div class="git-stop-body">Pull the latest main down to your machine so you're up to date. You're back at the beginning — ready to create the next branch and start again.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="insight-band">
+    <span class="insight-label">The golden rule</span>
+    <p>Never commit directly to main. Always branch → change → push → PR → review → merge. That single loop is how teams ship safely.</p>
+  </div>
+
+  <section class="section alt">
+    <div class="section-title">Common situations</div>
+    <div class="section-sub">Things that trip up newcomers and how to handle them.</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-title">Merge conflict</div>
+        <div class="card-body">Two people changed the same line. Git pauses and asks you to decide which version to keep. Open the file, look for the <code style="font-family:var(--font-mono);color:var(--xplor-purple);font-size:11px">&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> markers, edit to the correct version, then commit.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">My branch is behind main</div>
+        <div class="card-body">Others merged to main while you were working. Run <code style="font-family:var(--font-mono);color:var(--xplor-purple);font-size:11px">git pull origin main</code> on your branch to bring in their changes before you push your PR.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Undo the last commit</div>
+        <div class="card-body"><code style="font-family:var(--font-mono);color:var(--xplor-purple);font-size:11px">git reset --soft HEAD~1</code> removes the commit but keeps your changes staged. Safe to use before you've pushed.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">See what changed</div>
+        <div class="card-body"><code style="font-family:var(--font-mono);color:var(--xplor-purple);font-size:11px">git diff</code> shows unstaged changes. <code style="font-family:var(--font-mono);color:var(--xplor-purple);font-size:11px">git log --oneline</code> lists recent commits. <code style="font-family:var(--font-mono);color:var(--xplor-purple);font-size:11px">git status</code> is your dashboard.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══ TAB 3: CURSOR ═══ -->
+<div id="tab-cursor" class="tab-panel">
+
+  <section class="section">
+    <svg width="100%" viewBox="0 0 680 860" role="img" style="display:block;max-width:680px;margin:0 auto 32px;"
+         xmlns="http://www.w3.org/2000/svg">
+      <title>The Cursor studio</title>
+      <desc>Structural diagram showing Cursor's editor, Plan/Ask/Agent modes, chat panel, .cursorrules, MCP tools, and model selector — using an architect's studio analogy.</desc>
+      <defs>
+        <marker id="csar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#B4BEC6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="csar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- TITLE -->
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="20" fill="#282F35" x="340" y="32" text-anchor="middle">The Cursor studio</text>
+      <text font-family="'Roboto',sans-serif" font-size="13" fill="#545D63" x="340" y="52" text-anchor="middle">Cursor is an architect's studio — the editor is your drafting table, AI modes are specialists you call in</text>
+
+      <!-- OUTER: Cursor app shell -->
+      <rect x="20" y="66" width="640" height="516" rx="16" fill="#EDE8FE" stroke="#8C85FF" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="14" fill="#401F9F" x="42" y="92">Cursor (the app)</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#534AB7" x="42" y="108">VS Code foundation — all extensions and shortcuts work here</text>
+
+      <!-- EDITOR -->
+      <rect x="40" y="120" width="378" height="72" rx="10" fill="#E8F7F3" stroke="#3ACBCA" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="14" fill="#0F6E56" x="229" y="149" text-anchor="middle">Editor / drafting table</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#1D9E75" x="229" y="169" text-anchor="middle">Where you write code — Tab autocomplete active at all times</text>
+
+      <!-- CHAT PANEL -->
+      <rect x="434" y="120" width="206" height="218" rx="10" fill="#F1F0F0" stroke="#B4BEC6" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="14" fill="#282F35" x="537" y="148" text-anchor="middle">Chat panel</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#545D63" x="537" y="168" text-anchor="middle">Cmd+L</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#545D63" x="537" y="190" text-anchor="middle">Full codebase</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#545D63" x="537" y="206" text-anchor="middle">context. Use @file,</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#545D63" x="537" y="222" text-anchor="middle">@folder, @docs to</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#545D63" x="537" y="238" text-anchor="middle">pin specific context</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#545D63" x="537" y="258" text-anchor="middle">Cmd+K = inline edit</text>
+      <text font-family="'Roboto',sans-serif" font-size="11" fill="#8C969F" x="537" y="280" text-anchor="middle">Plan / Ask / Agent</text>
+      <text font-family="'Roboto',sans-serif" font-size="11" fill="#8C969F" x="537" y="296" text-anchor="middle">modes live here</text>
+      <text font-family="'Roboto',sans-serif" font-size="11" fill="#8C969F" x="537" y="318" text-anchor="middle">Select in toolbar ↑</text>
+
+      <!-- AI MODES LABEL -->
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#8C969F" x="229" y="220" text-anchor="middle">AI modes — call in a specialist</text>
+
+      <!-- PLAN -->
+      <rect x="40" y="232" width="114" height="106" rx="8" fill="#FFF7E6" stroke="#EF9F27" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="14" fill="#7A5100" x="97" y="258" text-anchor="middle">Plan</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#854F0B" x="97" y="278" text-anchor="middle">Reviews the</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#854F0B" x="97" y="294" text-anchor="middle">task, proposes</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#854F0B" x="97" y="310" text-anchor="middle">steps before</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#854F0B" x="97" y="326" text-anchor="middle">acting</text>
+
+      <!-- ASK -->
+      <rect x="172" y="232" width="114" height="106" rx="8" fill="#EAF1FB" stroke="#378ADD" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="14" fill="#0C447C" x="229" y="258" text-anchor="middle">Ask</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#185FA5" x="229" y="278" text-anchor="middle">Answers</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#185FA5" x="229" y="294" text-anchor="middle">questions,</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#185FA5" x="229" y="310" text-anchor="middle">explains code</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#185FA5" x="229" y="326" text-anchor="middle">— read-only</text>
+
+      <!-- AGENT -->
+      <rect x="304" y="232" width="114" height="106" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="14" fill="#4A1B0C" x="361" y="258" text-anchor="middle">Agent</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#712B13" x="361" y="278" text-anchor="middle">Autonomous —</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#712B13" x="361" y="294" text-anchor="middle">edits files, runs</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#712B13" x="361" y="310" text-anchor="middle">terminal,</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#712B13" x="361" y="326" text-anchor="middle">ships code</text>
+
+      <!-- Arrows from modes up to editor -->
+      <line x1="97" y1="232" x2="130" y2="194" stroke="#EF9F27" stroke-width="1.5" marker-end="url(#csar)"/>
+      <line x1="229" y1="232" x2="229" y2="194" stroke="#378ADD" stroke-width="1.5" marker-end="url(#csar)"/>
+      <line x1="361" y1="232" x2="320" y2="194" stroke="#D85A30" stroke-width="1.5" marker-end="url(#csar)"/>
+
+      <!-- .cursorrules -->
+      <rect x="40" y="356" width="378" height="74" rx="8" fill="#EAF3DE" stroke="#97C459" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="13" fill="#27500A" x="229" y="377" text-anchor="middle">.cursorrules  (skills / house style guide)</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#3B6D11" x="229" y="397" text-anchor="middle">Persistent instructions in repo root —</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#3B6D11" x="229" y="414" text-anchor="middle">coding standards, stack, naming applied to every AI call</text>
+
+      <!-- Arrow from .cursorrules up to modes -->
+      <line x1="229" y1="356" x2="229" y2="340" stroke="#3B6D11" stroke-width="1.5" marker-end="url(#csar2)"/>
+
+      <!-- MCP TOOLS -->
+      <rect x="40" y="446" width="600" height="54" rx="8" fill="#E8F7F3" stroke="#3ACBCA" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="13" fill="#0F6E56" x="340" y="469" text-anchor="middle">MCP tools</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#1D9E75" x="340" y="487" text-anchor="middle">Connectors that let Agent mode call GitHub, Jira, Notion, databases — without leaving the editor</text>
+
+      <!-- MODEL SELECTOR -->
+      <rect x="40" y="514" width="600" height="34" rx="6" fill="#F1F0F0" stroke="#B4BEC6" stroke-width="1"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="12" fill="#282F35" x="150" y="535" text-anchor="middle">Model selector</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#8C969F" x="420" y="535" text-anchor="middle">Claude Sonnet 4 · Claude Opus 4 · GPT-4o · Gemini</text>
+
+      <!-- KEY INSIGHT -->
+      <rect x="20" y="592" width="640" height="60" rx="10" fill="#FFFFFF" stroke="#6923F4" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="14" fill="#6923F4" x="340" y="616" text-anchor="middle">Key insight</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#282F35" x="340" y="636" text-anchor="middle">Plan = think before acting.  Ask = question, no edits.  Agent = autonomous multi-file execution.</text>
+      <text font-family="'Roboto',sans-serif" font-size="11" fill="#545D63" x="340" y="650" text-anchor="middle">.cursorrules shapes how all three behave — set it once per repo.</text>
+
+      <!-- WHEN TO USE EACH MODE -->
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="14" fill="#282F35" x="340" y="694" text-anchor="middle">When to use each mode</text>
+
+      <!-- Plan when card -->
+      <rect x="20" y="706" width="196" height="102" rx="8" fill="#FFF7E6" stroke="#EF9F27" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="13" fill="#7A5100" x="118" y="730" text-anchor="middle">Plan mode</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#854F0B" x="118" y="750" text-anchor="middle">Complex, multi-file task.</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#854F0B" x="118" y="766" text-anchor="middle">Review the plan</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#854F0B" x="118" y="782" text-anchor="middle">before it runs</text>
+      <text font-family="'Roboto',sans-serif" font-size="11" fill="#BA7517" x="118" y="800" text-anchor="middle">e.g. add dark mode across app</text>
+
+      <!-- Ask when card -->
+      <rect x="234" y="706" width="196" height="102" rx="8" fill="#EAF1FB" stroke="#378ADD" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="13" fill="#0C447C" x="332" y="730" text-anchor="middle">Ask mode</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#185FA5" x="332" y="750" text-anchor="middle">Understand a bug,</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#185FA5" x="332" y="766" text-anchor="middle">explore unfamiliar</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#185FA5" x="332" y="782" text-anchor="middle">code, no side effects</text>
+      <text font-family="'Roboto',sans-serif" font-size="11" fill="#378ADD" x="332" y="800" text-anchor="middle">e.g. why does this crash?</text>
+
+      <!-- Agent when card -->
+      <rect x="448" y="706" width="212" height="102" rx="8" fill="#FAECE7" stroke="#D85A30" stroke-width="1.5"/>
+      <text font-family="'Poppins',sans-serif" font-weight="700" font-size="13" fill="#4A1B0C" x="554" y="730" text-anchor="middle">Agent mode</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#712B13" x="554" y="750" text-anchor="middle">Refactor a module,</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#712B13" x="554" y="766" text-anchor="middle">scaffold a feature,</text>
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#712B13" x="554" y="782" text-anchor="middle">write + run tests</text>
+      <text font-family="'Roboto',sans-serif" font-size="11" fill="#D85A30" x="554" y="800" text-anchor="middle">e.g. migrate auth to OAuth</text>
+
+      <text font-family="'Roboto',sans-serif" font-size="12" fill="#8C969F" x="340" y="840" text-anchor="middle">Scroll down for shortcuts, Git workflow, and Cursor vs Claude Code ↓</text>
+    </svg>
+
+    <div class="section-title">What is Cursor?</div>
+    <div class="section-sub">An AI-native code editor built on VS Code. Everything you know from VS Code works — plus a deeply integrated AI pair programmer powered by Claude (and other models).</div>
+
+    <div class="cursor-compare">
+      <div class="compare-col col-cursor">
+        <div class="compare-col-title">🟢 Cursor strengths</div>
+        <ul class="compare-list">
+          <li>Lives in your editor — no context switching</li>
+          <li>Sees your entire codebase, not just the open file</li>
+          <li>Inline edits: accept or reject diff-by-diff</li>
+          <li>Chat with full repo context (⌘K, ⌘L)</li>
+          <li>Agent mode runs multi-file tasks autonomously</li>
+          <li>Autocomplete that understands your patterns</li>
+          <li>Works with all VS Code extensions and themes</li>
+        </ul>
+      </div>
+      <div class="compare-col col-claude">
+        <div class="compare-col-title">🟣 Cursor vs Claude Code</div>
+        <ul class="compare-list">
+          <li>Cursor = GUI editor (great for visual learners)</li>
+          <li>Claude Code = terminal CLI (great for power users)</li>
+          <li>Both use Claude under the hood</li>
+          <li>Cursor is better for reviewing diffs visually</li>
+          <li>Claude Code is better for scripted, headless tasks</li>
+          <li>Many engineers use both — Cursor daily, Claude Code for automation</li>
+          <li>Both follow the same Git branching workflow</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="insight-band green">
+    <span class="insight-label">Key insight</span>
+    <p>Cursor is VS Code with AI built in. If you already know VS Code, you already know 90% of Cursor. The AI features layer on top — you opt into them when you need them.</p>
+  </div>
+
+  <section class="section alt">
+    <div class="section-title">Core Cursor features</div>
+    <div class="section-sub">The six things you'll use every day.</div>
+    <div class="feature-grid">
+
+      <div class="feature-card">
+        <div class="feature-card-head"><span class="feature-card-icon">✏️</span> Inline edit (⌘K)</div>
+        <div class="feature-card-body">Select code, press <code>⌘K</code> (Mac) or <code>Ctrl+K</code> (Win), describe what to change. Cursor shows a diff — accept with <code>Tab</code>, reject with <code>Esc</code>. Works on any selection.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-head"><span class="feature-card-icon">💬</span> Chat panel (⌘L)</div>
+        <div class="feature-card-body">Open a chat sidebar with full codebase context. Ask questions, request explanations, or ask for code that spans multiple files. Reference specific files with <code>@filename</code>.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-head"><span class="feature-card-icon">🤖</span> Composer / Agent</div>
+        <div class="feature-card-body">Give Cursor a multi-step task ("add a dark mode toggle to the settings page") and it plans and executes changes across multiple files autonomously. Review all diffs before accepting.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-head"><span class="feature-card-icon">⚡</span> Tab autocomplete</div>
+        <div class="feature-card-body">Context-aware autocomplete that learns your patterns. Press <code>Tab</code> to accept a suggestion, <code>Esc</code> to dismiss. It predicts multi-line completions, not just the next word.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-head"><span class="feature-card-icon">📎</span> @ references</div>
+        <div class="feature-card-body">In any chat or prompt, use <code>@filename</code>, <code>@folder</code>, <code>@codebase</code>, or <code>@docs</code> to pull specific context into your prompt. Keeps answers accurate and grounded.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-head"><span class="feature-card-icon">📋</span> .cursorrules</div>
+        <div class="feature-card-body">A file in your repo root (like <code>CLAUDE.md</code>) that gives Cursor persistent instructions — your coding standards, stack preferences, naming conventions. Applied to every AI interaction.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-title">Essential shortcuts</div>
+    <div class="section-sub">The commands that unlock 80% of Cursor's value.</div>
+    <table class="shortcut-table">
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Mac</th>
+          <th>Windows / Linux</th>
+          <th>What it does</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Inline edit</td>
+          <td><span class="kbd">⌘ K</span></td>
+          <td><span class="kbd">Ctrl K</span></td>
+          <td class="shortcut-desc">Open an AI prompt on your current selection</td>
+        </tr>
+        <tr>
+          <td>Chat panel</td>
+          <td><span class="kbd">⌘ L</span></td>
+          <td><span class="kbd">Ctrl L</span></td>
+          <td class="shortcut-desc">Open the AI chat sidebar with codebase context</td>
+        </tr>
+        <tr>
+          <td>Composer</td>
+          <td><span class="kbd">⌘ I</span></td>
+          <td><span class="kbd">Ctrl I</span></td>
+          <td class="shortcut-desc">Open the multi-file agent / composer panel</td>
+        </tr>
+        <tr>
+          <td>Accept suggestion</td>
+          <td><span class="kbd">Tab</span></td>
+          <td><span class="kbd">Tab</span></td>
+          <td class="shortcut-desc">Accept the current autocomplete or inline edit</td>
+        </tr>
+        <tr>
+          <td>Reject suggestion</td>
+          <td><span class="kbd">Esc</span></td>
+          <td><span class="kbd">Esc</span></td>
+          <td class="shortcut-desc">Dismiss the current suggestion without applying</td>
+        </tr>
+        <tr>
+          <td>Command palette</td>
+          <td><span class="kbd">⌘ Shift P</span></td>
+          <td><span class="kbd">Ctrl Shift P</span></td>
+          <td class="shortcut-desc">Open VS Code command palette (all Cursor settings live here too)</td>
+        </tr>
+        <tr>
+          <td>Toggle terminal</td>
+          <td><span class="kbd">⌃ `</span></td>
+          <td><span class="kbd">Ctrl `</span></td>
+          <td class="shortcut-desc">Open the integrated terminal — run Git commands here</td>
+        </tr>
+        <tr>
+          <td>Source control panel</td>
+          <td><span class="kbd">⌘ Shift G</span></td>
+          <td><span class="kbd">Ctrl Shift G</span></td>
+          <td class="shortcut-desc">Open the Git diff / staging panel — visual alternative to the terminal</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section alt">
+    <div class="section-title">Git inside Cursor</div>
+    <div class="section-sub">The full Git workflow from the previous tab works identically in Cursor — just with extra UI and AI helpers on top.</div>
+    <div class="rules-list">
+
+      <div class="rule-item">
+        <div class="rule-num">1</div>
+        <div>
+          <div class="rule-content-title">Clone via the terminal panel</div>
+          <div class="rule-content-body">Open Cursor, then press <code>⌃`</code> to open the terminal. Run <code>git clone &lt;url&gt;</code> as normal. Cursor detects the repo and activates Git features automatically.</div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-num">2</div>
+        <div>
+          <div class="rule-content-title">Branch from the status bar</div>
+          <div class="rule-content-body">The current branch name shows in the bottom-left status bar. Click it to switch branches or create a new one — no terminal needed. Equivalent to <code>git checkout -b</code>.</div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-num">3</div>
+        <div>
+          <div class="rule-content-title">Stage and commit in the Source Control panel</div>
+          <div class="rule-content-body">Press <code>⌘ Shift G</code> to see all changed files. Click the <code>+</code> icon to stage (equivalent to <code>git add</code>). Type a message and press <code>⌘ Enter</code> to commit. Or use <code>⌘K</code> to AI-generate a commit message from your diff.</div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-num">4</div>
+        <div>
+          <div class="rule-content-title">Push and open a PR</div>
+          <div class="rule-content-body">Click the sync/push icon in the Source Control panel, or run <code>git push origin &lt;branch&gt;</code> in the terminal. Then open GitHub to raise the PR — same as always.</div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-num">5</div>
+        <div>
+          <div class="rule-content-title">Use AI to write your commit messages</div>
+          <div class="rule-content-body">In the Source Control panel, click the sparkle ✨ icon in the commit message field. Cursor reads your diff and generates a conventional commit message — edit before committing.</div>
+        </div>
+      </div>
+
+      <div class="rule-item">
+        <div class="rule-num">6</div>
+        <div>
+          <div class="rule-content-title">Review PR feedback with AI help</div>
+          <div class="rule-content-body">After a reviewer leaves comments, paste the feedback into Cursor's chat panel with <code>⌘L</code> and ask it to implement the changes. Review the diffs, accept what looks right, push the new commits.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="insight-band green">
+    <span class="insight-label">Pro tip</span>
+    <p>Add a <code>.cursorrules</code> file to every repo with your team's conventions — language version, naming patterns, test requirements. Every engineer on the team gets consistent AI suggestions without having to re-explain the rules each session.</p>
+  </div>
+
+  <section class="section">
+    <div class="section-title">Cursor + Claude Code: when to use which</div>
+    <div class="section-sub">They complement each other — this isn't an either/or choice.</div>
+    <div class="cards-grid">
+      <div class="card">
+        <span class="card-icon">🖥️</span>
+        <div class="card-title">Use Cursor when…</div>
+        <div class="card-body">You want to see and review diffs visually, you're exploring an unfamiliar codebase, you're doing iterative UI work, or you prefer staying in an editor with full file tree and extensions.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">⌨️</span>
+        <div class="card-title">Use Claude Code when…</div>
+        <div class="card-body">You're running a scripted task across many files, automating a repetitive refactor, working in CI/CD pipelines, or you prefer staying in the terminal without switching to a GUI.</div>
+      </div>
+      <div class="card">
+        <span class="card-icon">🤝</span>
+        <div class="card-title">Use both when…</div>
+        <div class="card-body">Use Claude Code to do a large autonomous refactor, then review the results in Cursor's diff view. Or use Cursor to explore a problem, then hand off to Claude Code to execute the solution.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ═══ TAB 4: WORD BANK ═══ -->
+<div id="tab-wordbank" class="tab-panel">
+
+  <section class="section">
+    <div class="section-title">Word bank</div>
+    <div class="section-sub">36 terms across Git, GitHub, Claude, and Cursor. Filter by category.</div>
+
+    <div class="wb-filter-row">
+      <button class="wb-filter active" onclick="filterWB('all', this)">All</button>
+      <button class="wb-filter" onclick="filterWB('git', this)">Git commands</button>
+      <button class="wb-filter" onclick="filterWB('github', this)">GitHub concepts</button>
+      <button class="wb-filter" onclick="filterWB('claude', this)">Claude terms</button>
+      <button class="wb-filter" onclick="filterWB('cursor', this)">Cursor</button>
+    </div>
+
+    <div class="wb-grid" id="wb-grid">
+
+      <!-- GIT -->
+      <div class="wb-card" data-cat="git"><span class="wb-badge badge-git">Git</span><div class="wb-term">git clone &lt;url&gt;</div><div class="wb-def">Download a full copy of a remote repo to your local machine</div></div>
+      <div class="wb-card" data-cat="git"><span class="wb-badge badge-git">Git</span><div class="wb-term">git checkout -b &lt;name&gt;</div><div class="wb-def">Create a new branch and switch to it immediately</div></div>
+      <div class="wb-card" data-cat="git"><span class="wb-badge badge-git">Git</span><div class="wb-term">git add .</div><div class="wb-def">Stage all changed files, readying them for a commit</div></div>
+      <div class="wb-card" data-cat="git"><span class="wb-badge badge-git">Git</span><div class="wb-term">git commit -m "msg"</div><div class="wb-def">Save a labelled snapshot of your staged changes</div></div>
+      <div class="wb-card" data-cat="git"><span class="wb-badge badge-git">Git</span><div class="wb-term">git push origin &lt;branch&gt;</div><div class="wb-def">Upload your local branch to the remote (GitHub)</div></div>
+      <div class="wb-card" data-cat="git"><span class="wb-badge badge-git">Git</span><div class="wb-term">git pull origin main</div><div class="wb-def">Fetch and merge the latest remote changes into your local branch</div></div>
+      <div class="wb-card" data-cat="git"><span class="wb-badge badge-git">Git</span><div class="wb-term">git status / git log</div><div class="wb-def">Check what's changed locally or review commit history</div></div>
+      <div class="wb-card" data-cat="git"><span class="wb-badge badge-git">Git</span><div class="wb-term">Merge conflict</div><div class="wb-def">When two branches changed the same line — Git asks you to decide which version to keep</div></div>
+
+      <!-- GITHUB -->
+      <div class="wb-card" data-cat="github"><span class="wb-badge badge-gh">GitHub</span><div class="wb-term">Repository (repo)</div><div class="wb-def">A project folder tracked by Git — contains all code, history, and branches</div></div>
+      <div class="wb-card" data-cat="github"><span class="wb-badge badge-gh">GitHub</span><div class="wb-term">main branch</div><div class="wb-def">The primary, production-ready branch — the source of truth</div></div>
+      <div class="wb-card" data-cat="github"><span class="wb-badge badge-gh">GitHub</span><div class="wb-term">Feature branch</div><div class="wb-def">A short-lived branch for one piece of work — isolated from main until ready</div></div>
+      <div class="wb-card" data-cat="github"><span class="wb-badge badge-gh">GitHub</span><div class="wb-term">Pull request (PR)</div><div class="wb-def">A request to merge your branch into main — triggers review and discussion</div></div>
+      <div class="wb-card" data-cat="github"><span class="wb-badge badge-gh">GitHub</span><div class="wb-term">Code review</div><div class="wb-def">Teammates inspect your changes before they land — catches bugs, improves quality</div></div>
+      <div class="wb-card" data-cat="github"><span class="wb-badge badge-gh">GitHub</span><div class="wb-term">Merge</div><div class="wb-def">Combining your branch's commits into main — the finish line of a PR</div></div>
+      <div class="wb-card" data-cat="github"><span class="wb-badge badge-gh">GitHub</span><div class="wb-term">origin</div><div class="wb-def">The default nickname for the remote repo you cloned from</div></div>
+      <div class="wb-card" data-cat="github"><span class="wb-badge badge-gh">GitHub</span><div class="wb-term">Fork</div><div class="wb-def">Your own copy of someone else's repo — used for open-source contributions</div></div>
+
+      <!-- CLAUDE -->
+      <div class="wb-card" data-cat="claude"><span class="wb-badge badge-claude">Claude</span><div class="wb-term">SKILL.md</div><div class="wb-def">A playbook file that gives Claude a specific capability — loaded on trigger</div></div>
+      <div class="wb-card" data-cat="claude"><span class="wb-badge badge-claude">Claude</span><div class="wb-term">CLAUDE.md</div><div class="wb-def">A persistent context file in your repo root — Claude Code reads it every session</div></div>
+      <div class="wb-card" data-cat="claude"><span class="wb-badge badge-claude">Claude</span><div class="wb-term">MCP tool</div><div class="wb-def">A connector letting Claude talk to external apps — Jira, Notion, Figma, GitHub</div></div>
+      <div class="wb-card" data-cat="claude"><span class="wb-badge badge-claude">Claude</span><div class="wb-term">Agentic mode</div><div class="wb-def">Claude takes multi-step actions autonomously — searches, edits, runs tools</div></div>
+      <div class="wb-card" data-cat="claude"><span class="wb-badge badge-claude">Claude</span><div class="wb-term">Cowork</div><div class="wb-def">Desktop app for non-engineers — automates file and task workflows without code</div></div>
+      <div class="wb-card" data-cat="claude"><span class="wb-badge badge-claude">Claude</span><div class="wb-term">Claude Code</div><div class="wb-def">CLI tool for engineers — reads, writes, and runs code directly in your terminal</div></div>
+      <div class="wb-card" data-cat="claude"><span class="wb-badge badge-claude">Claude</span><div class="wb-term">Memory</div><div class="wb-def">Summaries from past chats that personalise Claude's responses across sessions</div></div>
+      <div class="wb-card" data-cat="claude"><span class="wb-badge badge-claude">Claude</span><div class="wb-term">Prompt</div><div class="wb-def">The instructions you give Claude — quality of output scales with quality of prompt</div></div>
+
+      <!-- CURSOR -->
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Inline edit (⌘K)</div><div class="wb-def">Select code, describe a change, accept or reject the AI-generated diff</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Chat panel (⌘L)</div><div class="wb-def">AI chat sidebar with full codebase context — ask questions, request changes across files</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Composer / Agent</div><div class="wb-def">Multi-file autonomous AI task runner — give it a goal, review all diffs before applying</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Tab autocomplete</div><div class="wb-def">Context-aware multi-line code suggestions — press Tab to accept, Esc to dismiss</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">@ references</div><div class="wb-def">Pull specific files, folders, or docs into a chat prompt using @filename syntax</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">.cursorrules</div><div class="wb-def">A repo-root file of persistent AI instructions — coding standards applied to every session</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Diff view</div><div class="wb-def">Visual before/after of proposed AI changes — green = added, red = removed</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Source control panel</div><div class="wb-def">VS Code's built-in Git UI — stage, commit, and push without touching the terminal</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Plan mode</div><div class="wb-def">Reviews the task and proposes steps before making any edits — best for complex multi-file work</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Ask mode</div><div class="wb-def">Answers questions and explains code without touching files — read-only, no side effects</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Agent mode</div><div class="wb-def">Autonomous multi-file execution — edits files, runs terminal commands, scaffolds features</div></div>
+      <div class="wb-card" data-cat="cursor"><span class="wb-badge badge-cursor">Cursor</span><div class="wb-term">Model selector</div><div class="wb-def">Switch between Claude Sonnet, Claude Opus, GPT-4o, Gemini — different models for different tasks</div></div>
+
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>Claude + Git + Cursor · Quick Reference · Xplor Embedded Payments</span>
+  <span>Generated <strong>May 2026</strong> · For internal use</span>
+</footer>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+function filterWB(cat, btn) {
+  document.querySelectorAll('.wb-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.wb-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat === cat) {
+      delete card.dataset.hidden;
+    } else {
+      card.dataset.hidden = '1';
+    }
+  });
+}
+</script>
+</body>
+</html>
